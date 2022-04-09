@@ -213,7 +213,7 @@ def clear_imported(path: str, action: str, do_it: bool, no_skip_on_differing_tim
 @click.option('--no-abort-on-error', type=bool, default=False, show_default=True, is_flag=True, help='Do not abort on errors. Useful to check for any potential errors before actually importing files.')
 @click.option('--no-force-add-metadata', type=bool, default=False, show_default=True, is_flag=True, help='Do not add metadata for files already in Hydrus.')
 @click.option('--force-add-files', type=bool, default=False, show_default=True, is_flag=True, help='Send files to Hydrus even if they are already in Hydrus.')
-@click.option('--subdir', type=str, default='', show_default=True, help='Only scan a subdirectory, should start with \'gallery-dl\', import jobs must be reconfigured for this!')
+@click.option('--subdir', type=str, default='', show_default=True, help='Only scan a subdirectory, should start with \'gallery-dl\'. ex \'gallery-dl/pixiv\'.')
 def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differing_times: bool, config: Optional[str], verbose: bool, do_it: bool, no_abort_on_missing_metadata: bool, filename_regex: Optional[str], no_abort_on_error: bool, no_force_add_metadata: bool, force_add_files: bool, subdir: str) -> None:
     log.init(path, True)
     db.init(path)
