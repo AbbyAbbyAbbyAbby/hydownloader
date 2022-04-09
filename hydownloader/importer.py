@@ -486,7 +486,16 @@ def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differi
                         if path_based_import:
                             client.add_file(abspath)
                         else:
-                            client.add_file(io.BytesIO(open(abspath, 'rb').read()))
+                            response = client.add_file(io.BytesIO(open(abspath, 'rb').read()))
+                            # undelete, custom logic
+                            if response['status'] == 3:
+                                printerr(f'Failed to import, file is deleted. Undeleting and adding again ...', False)
+                                client.undelete_files([hexdigest])
+                                response = client.add_file(io.BytesIO(open(abspath, 'rb').read()))
+                                if response['status'] > 2:
+                                    printerr(f'Failed to import! {abspath}', True)
+                            elif response['status'] > 3:
+                                printerr(f'Failed to import, status is ' + str(response['status']), True)
                 if not already_added or not no_force_add_metadata:
                     if verbose: printerr("Associating URLs...", False)
                     if do_it and generated_urls_filtered: client.associate_url(hashes=[hexdigest],urls_to_add=generated_urls_filtered)
