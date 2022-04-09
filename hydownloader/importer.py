@@ -72,6 +72,37 @@ def get_namespaces_tags(data: dict[str, Any], key_prefix : str = 'tags_', separa
             final_result.append(pair)
     return final_result
 
+
+# Get tags from a nested JSON entry
+# Example from 3621
+# {
+#     "tags": {
+#         "artist": [
+#             "artist_name"
+#         ],
+#         "character": [],
+#         "general": [
+#             "furry",
+#             "gay_furry",
+#             "straight_furry"
+#         ]
+#     }
+# }
+# data should be the tags entry like "json_data['tags']
+def get_nested_tags(data: dict[str, Any]) -> list[str]:
+    tags = list[str]()
+    for namespace in data:
+        ns = '' if namespace != 'general' else namespace
+        if ns == 'artist':
+            ns = 'creator'
+        if ns == 'copyright':
+            ns = 'series'
+        for tag in namespace:
+            tags.append(ns + ':' + tag)
+
+    return tags
+
+
 # Helper function to use in user-defined importer expressions
 def clean_url(url: str) -> str:
     return re.sub(r'(?<!:)//', '/', url)
