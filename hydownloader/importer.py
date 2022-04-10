@@ -89,13 +89,18 @@ def get_namespaces_tags(data: dict[str, Any], key_prefix : str = 'tags_', separa
 #     }
 # }
 # data should be the tags entry like "json_data['tags']
-def get_nested_tags(data: dict[str, Any]) -> list[str]:
+def get_nested_tags_e621(data: dict[str, Any]) -> list[str]:
     tags = list[str]()
     for namespace in data:
-        ns = '' if namespace != 'general' else namespace
-        if ns == 'artist':
+        ns = namespace
+        if namespace == 'invalid':
+            #  e621 replaces tags they don't want with this or something like that, weird
+            pass
+        elif ns == 'general':
+            ns = ''
+        elif ns == 'artist':
             ns = 'creator'
-        if ns == 'copyright':
+        elif ns == 'copyright':
             ns = 'series'
         for tag in namespace:
             tags.append(ns + ':' + tag)
