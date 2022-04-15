@@ -529,11 +529,11 @@ def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differi
                             response = client.add_file(io.BytesIO(open(abspath, 'rb').read()))
                             # undelete, custom logic
                             if response['status'] == 3:
-                                printerr(f'Failed to import, file is deleted. Undeleting and adding again ...', False)
-                                client.undelete_files([hexdigest])
-                                response = client.add_file(io.BytesIO(open(abspath, 'rb').read()))
-                                if response['status'] > 2:
-                                    printerr(f'Failed to import! {abspath}', True)
+                                printerr(f'Failed to import, file is deleted!', False)  # Undeleting and adding again ...', False)
+                                # client.undelete_files([hexdigest])
+                                # response = client.add_file(io.BytesIO(open(abspath, 'rb').read()))
+                                # if response['status'] > 2:
+                                #     printerr(f'Failed to import! {abspath}', True)
                             elif response['status'] > 3:
                                 printerr(f'Failed to import, status is ' + str(response['status']), True)
                 if not already_added or not no_force_add_metadata:
