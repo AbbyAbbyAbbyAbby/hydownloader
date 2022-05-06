@@ -118,12 +118,15 @@ leave the test environment untouched so you can investigate the error.
 | fanbox | no | yes | no |
 | webtoons | no | yes | yes |
 | kemono.party | no | yes | no |
+| coomer.party | no | yes | no |
 | seiso.party | no | yes | no |
 | baraag | no | yes | yes |
 | pawoo | no | yes | yes |
 | hentaifoundry | yes | yes | yes |
 | yande.re | yes | yes | yes |
 | rule34.xxx | yes | yes | yes |
+| e621.net | yes | yes | yes |
+| furaffinity.net | yes | yes | yes |
 | any other site that gallery-dl supports | no | mostly* | no |
 
 *Downloading works, automatically getting subscription info from URLs and checking file download status through API from the anchor database does not.

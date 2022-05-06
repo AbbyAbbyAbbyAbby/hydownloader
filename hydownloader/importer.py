@@ -72,7 +72,6 @@ def get_namespaces_tags(data: dict[str, Any], key_prefix : str = 'tags_', separa
             final_result.append(pair)
     return final_result
 
-
 # Get tags from a nested JSON entry
 # Example from 3621
 # {
@@ -90,7 +89,7 @@ def get_namespaces_tags(data: dict[str, Any], key_prefix : str = 'tags_', separa
 # }
 # data should be the tags entry like "json_data['tags']
 def get_nested_tags_e621(data: dict[str, Any]) -> list[str]:
-    tags = list[str]()
+    tags: list[str] = []
     for namespace in data.items():
         ns = namespace[0]
         if ns == 'invalid':
@@ -110,7 +109,6 @@ def get_nested_tags_e621(data: dict[str, Any]) -> list[str]:
             tags.append(ns + tag.replace("_", " "))
 
     return tags
-
 
 # Helper function to use in user-defined importer expressions
 def clean_url(url: str) -> str:
@@ -253,8 +251,8 @@ def clear_imported(path: str, action: str, do_it: bool, no_skip_on_differing_tim
 @click.option('--no-abort-on-error', type=bool, default=False, show_default=True, is_flag=True, help='Do not abort on errors. Useful to check for any potential errors before actually importing files.')
 @click.option('--no-force-add-metadata', type=bool, default=False, show_default=True, is_flag=True, help='Do not add metadata for files already in Hydrus.')
 @click.option('--force-add-files', type=bool, default=False, show_default=True, is_flag=True, help='Send files to Hydrus even if they are already in Hydrus.')
-@click.option('--subdir', type=str, default=None, show_default=True, help='Only scan a subdirectory within the databases \'gallery-dl\' folder to target specific files. Use this to target specific folders. ex \'gelbooru/tag\' to import a specific gelbooru tag.')
-def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differing_times: bool, config: Optional[str], verbose: bool, do_it: bool, no_abort_on_missing_metadata: bool, filename_regex: Optional[str], no_abort_on_error: bool, no_force_add_metadata: bool, force_add_files: bool, subdir: str) -> None:
+@click.option('--subdir', type=str, default=None, show_default=True, help='Only scan a subdirectory within the database\'s \'gallery-dl\' folder to target specific files, e.g. \'gelbooru/tag\' to import a specific gelbooru tag.')
+def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differing_times: bool, config: Optional[str], verbose: bool, do_it: bool, no_abort_on_missing_metadata: bool, filename_regex: Optional[str], no_abort_on_error: bool, no_force_add_metadata: bool, force_add_files: bool, subdir: Optional[str]) -> None:
     log.init(path, True)
     db.init(path)
 
@@ -277,7 +275,7 @@ def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differi
     effective_path = data_path
     if subdir is not None:
         # replace is to convert windows paths
-        effective_path = effective_path + '/' + subdir.replace('\\', '/')
+        effective_path = effective_path + '/gallery-dl/' + unfuck_path_separator(subdir)
 
     client = hydrus_api.Client(jd['apiKey'], jd['apiURL'], session=get_session(5, 1))
 

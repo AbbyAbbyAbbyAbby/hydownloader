@@ -625,6 +625,25 @@ DEFAULT_IMPORT_JOBS = """{
         ]
       },
       {
+        "filter": "pstartswith(path, 'gallery-dl/coomerparty/')",
+        "tagReposForNonUrlSources": ["my tags"],
+        "tags": [
+          {
+            "name": "coomerparty generated tags",
+            "tagRepos": [
+              "my tags"
+            ],
+            "values": [
+              "'title:'+json_data['title']",
+              "'person:'+json_data['username']",
+              "'coomer.party service:'+json_data['service']",
+              "'coomer.party id:'+json_data['id']",
+              "'coomer.party user id:'+json_data['user']"
+            ]
+          }
+        ]
+      },
+      {
         "filter": "pstartswith(path, 'gallery-dl/directlink/')",
         "tagReposForNonUrlSources": ["my tags"],
         "urls": [
@@ -1004,6 +1023,92 @@ DEFAULT_IMPORT_JOBS = """{
               "json_data['file_url']",
               "'https://rule34.xxx/index.php?page=post&s=view&id='+json_data['id']",
               "json_data['source']"
+            ]
+          }
+        ]
+      },
+      {
+        "filter": "pstartswith(path, 'gallery-dl/e621/')",
+        "tagReposForNonUrlSources": ["my tags"],
+        "tags": [
+          {
+            "name": "e621 generated tags",
+            "allowEmpty": true,
+            "tagRepos": [
+              "my tags"
+            ],
+            "values": [
+              "'e621 id:' + str(json_data['id'])",
+              "'booru:e621'",
+              "'rating:' + json_data['rating']"
+            ]
+          },
+          {
+            "name": "e621 tags",
+            "allowTagsEndingWithColon": true,
+            "tagRepos": [
+              "my tags"
+            ],
+            "values": "get_nested_tags_e621(json_data['tags'])"
+          },
+          {
+            "name": "e621 post tags",
+            "allowTagsEndingWithColon": true,
+            "tagRepos": [
+              "my tags"
+            ],
+            "values": "get_nested_tags_e621(json_data['tags'])"
+          }
+        ],
+        "urls": [
+          {
+            "name": "e621 urls",
+            "allowEmpty": true,
+            "values": [
+              "json_data['gallerydl_file_url']",
+              "'https://e621.net/posts/' + str(json_data['id'])"
+            ]
+          }
+        ]
+      },
+      {
+        "filter": "pstartswith(path, 'gallery-dl/furaffinity/')",
+        "tagReposForNonUrlSources": ["my tags"],
+        "tags": [
+          {
+            "name": "furaffinity generated tags",
+            "allowEmpty": true,
+            "tagRepos": [
+              "my tags"
+            ],
+            "values": [
+              "'furaffinity id:'+str(json_data['id'])",
+              "'booru:furaffinity'",
+              "'rating:'+json_data['rating']",
+              "'creator:'+json_data['artist']",
+              "'title:'+json_data['title']",
+              "('gender:'+json_data['gender']) if json_data['gender'] != 'Any' else ''",
+              "('species:'+json_data['species']) if json_data['species'] != 'Unspecified / Any' else ''"
+            ]
+          },
+          {
+            "name": "furaffinity tags",
+            "allowTagsEndingWithColon": true,
+            "allowEmpty": true,
+            "allowNoResult": true,
+            "tagRepos": [
+              "my tags"
+            ],
+            "values": "[tag.replace('_', ' ') for tag in json_data['tags']]"
+          }
+        ],
+        "urls": [
+          {
+            "name": "furaffinity urls",
+            "allowEmpty": true,
+            "values": [
+              "json_data['url']",
+              "'https://www.furaffinity.net/view/'+str(json_data['id'])+'/'"
             ]
           }
         ]
@@ -1607,6 +1712,11 @@ DEFAULT_GALLERY_DL_CONFIG = R"""{
             "filename": "{id}_{hash}_{type[0]}_{num}.{extension}",
             "archive-format": "{service}_{user}_{id}_{filename}_{type[0]}.{extension}"
         },
+        
+        "coomerparty": {
+            "filename": "{id}_{hash}_{type[0]}_{num}.{extension}",
+            "archive-format": "{service}_{user}_{id}_{filename}_{type[0]}.{extension}"
+        },
 
         "mastodon": {
             "archive-format": "{id}_{media[id]}"
@@ -1625,6 +1735,16 @@ DEFAULT_GALLERY_DL_CONFIG = R"""{
         },
         
         "rule34": {
+            "archive-format": "{id}"
+        },
+        
+        "e621": {
+            "archive-format": "{id}"
+        },
+        
+        "furaffinity": {
+            "external": false,
+            "filename": "{id}.{extension}",
             "archive-format": "{id}"
         }
     }
