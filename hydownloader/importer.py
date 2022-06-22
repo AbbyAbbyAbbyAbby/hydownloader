@@ -289,6 +289,10 @@ def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differi
 
     log.info("hydownloader-importer", f"Starting import job: {job}")
 
+    existing: int = 0
+    imported: int = 0
+    deleted: int = 0
+
     # iterate over all files in the data directory
     for root, _, files in os.walk(effective_path):
         # sort files before iterating over them
@@ -312,6 +316,14 @@ def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differi
 
             # already imported file
             if fname.endswith('.HYDL-IMPORTED'):
+                continue
+
+            # Windows thumbnails
+            if fname.endswith('.db'):
+                continue
+
+            # Skip urls.txt
+            if fname == 'urls.txt':
                 continue
 
             abspath = root + "/" + fname
@@ -523,6 +535,7 @@ def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differi
                     hexdigest = hasher.hexdigest()
                     if any(map(lambda x: x.get("is_local", False), client.get_file_metadata(hashes=[hexdigest]))):
                         printerr("File is already in Hydrus", False)
+                        existing = existing + 1
                         already_added = True
                 if verbose: printerr(f'Hash: {hexdigest}', False)
                 # send file, tags, metadata to Hydrus as needed
@@ -531,11 +544,13 @@ def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differi
                     if do_it:
                         if path_based_import:
                             client.add_file(abspath)
+                            imported = imported + 1
                         else:
                             response = client.add_file(io.BytesIO(open(abspath, 'rb').read()))
                             # undelete, custom logic
                             if response['status'] == 3:
                                 printerr(f'Failed to import, file is deleted!', False)  # Undeleting and adding again ...', False)
+                                deleted = deleted + 1
                                 # client.undelete_files([hexdigest])
                                 # response = client.add_file(io.BytesIO(open(abspath, 'rb').read()))
                                 # if response['status'] > 2:
@@ -560,6 +575,11 @@ def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differi
                 if verbose: printerr(f"Skipping due to no matching filter: {path}", False)
 
     log.info("hydownloader-importer", f"Finished import job: {job}")
+    total = existing + imported + deleted
+    log.info("hydownloader-importer", f"   total: {total}")
+    log.info("hydownloader-importer", f"imported: {imported}")
+    log.info("hydownloader-importer", f"existing: {existing}")
+    log.info("hydownloader-importer", f" deleted: {deleted}")
     db.shutdown()
 
 def main() -> None:
