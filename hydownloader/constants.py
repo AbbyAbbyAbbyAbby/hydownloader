@@ -270,10 +270,16 @@ DEFAULT_IMPORT_JOBS = """{
         ],
         "urls": [
           {
-            "name": "newgrounds urls",
+            "name": "newgrounds url",
             "values": [
-              "json_data['url']",
-              "'https://www.newgrounds.com/portal/view/'+str(json_data['index'])"
+              "json_data['url']"
+            ]
+          },
+          {
+            "name": "newgrounds post url",
+            "skipOnError": true,
+            "values": [
+              "json_data['post_url']"
             ]
           }
         ]
@@ -407,7 +413,7 @@ DEFAULT_IMPORT_JOBS = """{
               "my tags"
             ],
             "values": [
-              "'gelbooru id:'+json_data['id']",
+              "'gelbooru id:'+str(json_data['id'])",
               "'booru:gelbooru'",
               "'rating:'+json_data['rating']",
               "('title:'+json_data['title']) if json_data['title'] and json_data['title'].strip() else ''"
@@ -428,7 +434,7 @@ DEFAULT_IMPORT_JOBS = """{
             "allowEmpty": true,
             "values": [
               "json_data['file_url']",
-              "'https://gelbooru.com/index.php?page=post&s=view&id='+json_data['id']",
+              "'https://gelbooru.com/index.php?page=post&s=view&id='+str(json_data['id'])",
               "json_data['source']"
             ]
           }
@@ -1486,6 +1492,7 @@ DEFAULT_GALLERY_DL_USER_CONFIG = R"""{
             "tags": "original",
             "ugoira": true,
             "metadata": true,
+            "include": "artworks",
             "ranking": {
                 "max-posts": 100
             }
@@ -1712,7 +1719,7 @@ DEFAULT_GALLERY_DL_CONFIG = R"""{
             "filename": "{id}_{hash}_{type[0]}_{num}.{extension}",
             "archive-format": "{service}_{user}_{id}_{filename}_{type[0]}.{extension}"
         },
-        
+
         "coomerparty": {
             "filename": "{id}_{hash}_{type[0]}_{num}.{extension}",
             "archive-format": "{service}_{user}_{id}_{filename}_{type[0]}.{extension}"
@@ -1733,15 +1740,15 @@ DEFAULT_GALLERY_DL_CONFIG = R"""{
         "ytdl": {
             "module": "yt_dlp"
         },
-        
+
         "rule34": {
             "archive-format": "{id}"
         },
-        
+
         "e621": {
             "archive-format": "{id}"
         },
-        
+
         "furaffinity": {
             "external": false,
             "filename": "{id}.{extension}",

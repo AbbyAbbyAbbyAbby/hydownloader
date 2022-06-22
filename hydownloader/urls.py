@@ -153,7 +153,8 @@ def subscription_data_to_url(downloader: str, keywords: str, allow_fail: bool = 
         return f"https://e621.net/posts?tags={keywords}"
     if downloader == "furaffinity":
         return f"https://www.furaffinity.net/user/{keywords}/"
-
+    if downloader == "instagram":
+                return f"https://instagram.com/{keywords}"
     if not allow_fail:
         log.fatal("hydownloader", f"Invalid downloader: {downloader}")
     else:
@@ -229,9 +230,14 @@ def subscription_data_from_url(url: str) -> tuple[str, str]:
         return ('rule34', m.group('keywords').lower())
     if m := re.match(r"https?://e621\.net/posts\?tags=(?P<keywords>[^&]+)(&.*)?", u):
         return ('e621', m.group('keywords').lower())
-    if m := re.match(r"https?://www\.furaffinity\.net/user/(?P<username>[^&]+)(&.*)?/", u):
+    if m := re.match(r"https?://www\.furaffinity\.net/(user|gallery|scraps|favorites|journal)/(?P<username>[^&]+)(&.*)?/?", u):
         return ('furaffinity', m.group('username').lower())
-
+    if m := re.match(r"https?://(www\.)instagram\.com/p/(?P<shortcode>[^/]+)/?", u):
+        return ('instagram', m.group('shortcode'))
+    if m := re.match(r"https?://(www\.)instagram\.com/stories/highlights/(?P<storyid>[^/]+)?", u):
+        return ('instagram', m.group('storyid').lower())
+    if (m := re.match(r"https?://(www\.)instagram\.com/(?P<username>[^/]+)/?", u)) and not m.group('username') in ['p', 'stories', 'tv', 'reel']:
+        return ('instagram', m.group('username').lower())
     return ('','')
 
 def anchor_patterns_from_url(url: str) -> list[str]:
@@ -273,9 +279,9 @@ def anchor_patterns_from_url(url: str) -> list[str]:
         return [f"pixiv{m.group('id')}", f"pixiv{m.group('id')}_%"]
     if m := re.match(r"https?://(www\.|touch.)?pixiv\.(net|com)/member_illust\.php\?illust_id=(?P<id>[0-9]+)(&.*)?", u):
         return [f"pixiv{m.group('id')}", f"pixiv{m.group('id')}_%"]
-    if m := re.match(r"https?://(i(mg)?[0-9]+)\.pixiv\.(net|com)/img[0-9]*(/img)?/[^/]+/(?P<id>[0-9]+)((_|\.).*)?", u):
+    if m := re.match(r"https?://(i(mg)?[0-9]*)\.pixiv\.(net|com)/img[0-9]*(/img)?/[^/]+/(?P<id>[0-9]+)((_|\.).*)?", u):
         return [f"pixiv{m.group('id')}", f"pixiv{m.group('id')}_%"]
-    if m := re.match(r"https?://(i[0-9]+)\.pixiv\.(net|com)/(img-original|c/1200x1200/img-master)/img/([0-9]+/)+(?P<id>[0-9]+)((_|\.).*)?", u):
+    if m := re.match(r"https?://(i[0-9]*)(-f)?\.(pixiv|pximg)\.(net|com)/(img-original|c/1200x1200/img-master)/img/([0-9]+/)+(?P<id>[0-9]+)((_|\.).*)?", u):
         return [f"pixiv{m.group('id')}", f"pixiv{m.group('id')}_%"]
     if m := re.match(r"https?://(www\.|sp.)?nijie\.info/view(_popup)?\.php\?id=(?P<id>[0-9]+)(&.*)?", u):
         return [f"nijie{m.group('id')}", f"nijie{m.group('id')}_%"]
@@ -324,7 +330,7 @@ def anchor_patterns_from_url(url: str) -> list[str]:
         return [f"rule34{m.group('id')}"]
     if m := re.match(r"https?://e621.net/posts/(?P<id>[0-9]+)(&.*)?", u):
         return [f"e621{m.group('id')}"]
-    if m := re.match(r"https?://www\.furaffinity\.net/view/(?P<id>[^&]+)(&.*)?/", u):
+    if m := re.match(r"https?://www\.furaffinity\.net/view/(?P<id>[^&]+)(&.*)?/?", u):
         return [f"furaffinity{m.group('id')}"]
 
     return []
