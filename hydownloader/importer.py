@@ -542,21 +542,25 @@ def run_job(path: str, job: str, skip_already_imported: bool, no_skip_on_differi
                 if not already_added or force_add_files:
                     if verbose: printerr("Sending file to Hydrus...", False)
                     if do_it:
+                        response: dict
+                        # import the file, get the response
                         if path_based_import:
-                            client.add_file(abspath)
-                            imported = imported + 1
+                            response = client.add_file(abspath)
                         else:
                             response = client.add_file(io.BytesIO(open(abspath, 'rb').read()))
-                            # undelete, custom logic
-                            if response['status'] == 3:
-                                printerr(f'Failed to import, file is deleted!', False)  # Undeleting and adding again ...', False)
-                                deleted = deleted + 1
-                                # client.undelete_files([hexdigest])
-                                # response = client.add_file(io.BytesIO(open(abspath, 'rb').read()))
-                                # if response['status'] > 2:
-                                #     printerr(f'Failed to import! {abspath}', True)
-                            elif response['status'] > 3:
-                                printerr(f'Failed to import, status is ' + str(response['status']), True)
+
+                        # update counts based on result, existing is checked for previously
+                        if response['status'] == 1:
+                            imported = imported + 1
+                        elif response['status'] == 3:
+                            printerr(f'Failed to import, file is deleted!', False)  # Undeleting and adding again ...', False)
+                            deleted = deleted + 1
+                            # client.undelete_files([hexdigest])
+                            # response = client.add_file(io.BytesIO(open(abspath, 'rb').read()))
+                            # if response['status'] > 2:
+                            #     printerr(f'Failed to import! {abspath}', True)
+                        elif response['status'] > 3:
+                            printerr(f'Failed to import, status is ' + str(response['status']), True)
                 if not already_added or not no_force_add_metadata:
                     if verbose: printerr("Associating URLs...", False)
                     if do_it and generated_urls_filtered: client.associate_url(hashes=[hexdigest],urls_to_add=generated_urls_filtered)
