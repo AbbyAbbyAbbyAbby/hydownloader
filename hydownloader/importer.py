@@ -202,6 +202,14 @@ def clear_imported(path: str, action: str, do_it: bool, no_skip_on_differing_tim
             if fname.endswith('.HYDL-IMPORTED'):
                 continue
 
+            # Windows thumbnails
+            if fname.endswith('.db'):
+                continue
+
+            # Skip urls.txt
+            if fname == 'urls.txt':
+                continue
+
             abspath = root + "/" + fname
             path = os.path.relpath(abspath, start = data_path)
             ctime = os.stat(abspath).st_ctime
